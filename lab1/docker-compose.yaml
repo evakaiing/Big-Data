@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pg
+      POSTGRES_PASSWORD: pg
+      POSTGRES_DB: lab1_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./data:/data
+      - ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./02_ddl.sql:/docker-entrypoint-initdb.d/02_ddl.sql
+      - ./03_dml.sql:/docker-entrypoint-initdb.d/03_dml.sql
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
