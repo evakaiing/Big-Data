@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pg
+      POSTGRES_PASSWORD: pg
+      POSTGRES_DB: lab2_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - ./data:/data
+      - ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - pg_data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.3
+    container_name: lab2_clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse
+    volumes:
+      - ch_data:/var/lib/clickhouse
+
+  spark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: lab2_spark
+    user: root
+    environment:
+      JUPYTER_TOKEN: lab2
+      NB_UID: 1000
+      NB_GID: 100
+      CHOWN_HOME: "yes"
+      CHOWN_HOME_OPTS: "-R"
+      CHOWN_EXTRA: "/home/jovyan/work"
+      CHOWN_EXTRA_OPTS: "-R"
+      GRANT_SUDO: "yes"
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./etl:/home/jovyan/work
+    depends_on:
+      - postgres
+      - clickhouse
+
+volumes:
+  pg_data:
+  ch_data:
